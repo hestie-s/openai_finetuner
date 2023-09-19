@@ -30,7 +30,6 @@ def format_item(system_content, user_content, assistant_content):
 train = train.apply(lambda row: format_item("you are a blockchain expert", row[0], row[1]), axis=1)
 test = test.apply(lambda row: format_item("you are a blockchain expert", row[0], row[1]), axis=1)
 
-# Convert the formatted data to list before saving to jsonl
 train = train.tolist()
 test = test.tolist()
 
@@ -76,7 +75,6 @@ def query_fine_tuned_model(prompt, fine_tuned_model):
         max_tokens=60
     )
 
-# Upload the train and test files
 train_file = upload_file_to_openai('train.jsonl')
 test_file = upload_file_to_openai('test.jsonl')
 
@@ -84,13 +82,12 @@ print(f"Train file upload results: {train_file}")
 print(f"Test file upload results: {test_file}")
 print(f"Here is the list of all uploaded files: {list_uploaded_files()}")
 
-# Fine tune the model
 print(f"Starting finetunning process...")
 fine_tuned_model = fine_tune_model(train_file["id"], test_file["id"])
 
-# Check fine tune events
+
 fine_tune_events = check_fine_tune_events(fine_tuned_model["id"])
-print(fine_tune_events)
+print(f"Fine-tunning events: {fine_tune_events}")
 
 prompt = "Here some questions about the topic"
 
