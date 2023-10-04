@@ -8,8 +8,11 @@ import openai
 load_dotenv()
 
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-openai.api_key = OPENAI_API_KEY
+openai.api_type = "azure"
+openai.api_base = os.getenv("OPENAI_API_BASE")
+openai.api_version = "2022-12-01"
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
 MODEL = "gpt-3.5-turbo"
 
 dataset_path = "./question_answer.xlsx"
@@ -45,27 +48,28 @@ with open('test.jsonl', 'w') as f:
 
 def upload_file_to_openai(file_path):
     with open(file_path, "rb") as f:
-        return openai.File.create(file=f.read(), purpose="fine-tune")
+        file_content = f.read()
+        return openai.File.create(file=file_content, purpose="fine-tune",user_provided_filename=file_path)
 
 def list_uploaded_files():
     return openai.File.list()
 
 
-def fine_tune_model(train_file_id, test_file_id, model="text-davinci-002"):
-    return openai.FineTuning.create(
+def fine_tune_model(train_file_id, test_file_id, model=MODEL):
+    return openai.FineTuningJob.create(
         model=model,
-        dataset=train_file_id,
-        validation_dataset=test_file_id,
-        n_epochs=10,
-        learning_rate_multiplier=0.1
+        training_file=train_file_id,
+        validation_file=test_file_id
+        # n_epochs=10,
+        # learning_rate_multiplier=0.1
     )
 
 
 def list_fine_tuning_models():
-    return openai.FineTuning.list()
+    return openai.FineTuningJob.list()
 
 def check_fine_tune_events(fine_tuned_model_id):
-    return openai.FineTuning.retrieve(fine_tuned_model_id)
+    return openai.FineTuningJob.retrieve(fine_tuned_model_id)
 
 
 def query_fine_tuned_model(prompt, fine_tuned_model):
