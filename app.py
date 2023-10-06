@@ -7,13 +7,12 @@ import openai
 
 load_dotenv()
 
-
 openai.api_type = "azure"
 openai.api_base = os.getenv("OPENAI_API_BASE")
-openai.api_version = "2022-12-01"
+openai.api_version = os.getenv("OPEN_API_VERSION")
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-MODEL = "gpt-3.5-turbo"
+MODEL = "test-gpt-35-turbo"
 
 dataset_path = "./question_answer.xlsx"
 df = pd.read_excel(dataset_path)
@@ -59,7 +58,7 @@ def fine_tune_model(train_file_id, test_file_id, model=MODEL):
     return openai.FineTuningJob.create(
         model=model,
         training_file=train_file_id,
-        validation_file=test_file_id
+        validation_file=test_file_id,
         # n_epochs=10,
         # learning_rate_multiplier=0.1
     )
@@ -95,7 +94,7 @@ print(f"Fine-tunning events: {fine_tune_events}")
 
 prompt = "Here some questions about the topic"
 
-response = query_fine_tuned_model(prompt=prompt, fine_tuned_model=fine_tuned_model["id"])
+response = query_fine_tuned_model(prompt=prompt, fine_tuned_model=fine_tuned_model)
 
 print(response['choices'][0]['message'])
 

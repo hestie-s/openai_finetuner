@@ -13,14 +13,19 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 file = openai.File.create(
-  file=open("train.jsonl", "rb"),
+  file=open("hello.jsonl", "rb"),
   purpose='fine-tune',
-  user_provided_filename="train.jsonl"
+  user_provided_filename="hello.jsonl"
 )
 
+print(f"Uploaded: {file}")
 
-fine_tuned_model = openai.FineTuningJob.create(training_file=file["id"], model="gpt-3.5-turbo")
+fine_tuned_model = openai.FineTuningJob.create(
+  training_file=file["id"], 
+  model="test-gpt-35-turbo"
+  )
 
+print(f"fined tune model returned: {fine_tuned_model}")
 
 completion = openai.ChatCompletion.create(
   model=fine_tuned_model["id"],
